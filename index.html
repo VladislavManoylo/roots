@@ -92,6 +92,7 @@ function turn(x,y) {
 	let plant = playerOne ? PIECE_WHITE_PLANT : PIECE_BLACK_PLANT;
 	let root = playerOne ? PIECE_WHITE_ROOT : PIECE_BLACK_ROOT;
 	board[x][y] = plant;
+	let growth = [];
 	for (let i = 0; i < SIZE; i++) {
 		for (let j = 0; j < SIZE; j++) {
 			if (board[i][j] == plant) {
@@ -99,7 +100,7 @@ function turn(x,y) {
 					let tile = board[k][j];
 					if (tile != root) {
 						if (tile == PIECE_EMPTY)
-							board[k][j] = root;
+							growth.push([k,j]);
 						break;
 					}
 				}
@@ -107,7 +108,7 @@ function turn(x,y) {
 					let tile = board[k][j];
 					if (tile != root) {
 						if (tile == PIECE_EMPTY)
-							board[k][j] = root;
+							growth.push([k,j]);
 						break;
 					}
 				}
@@ -115,7 +116,7 @@ function turn(x,y) {
 					let tile = board[i][k];
 					if (tile != root) {
 						if (tile == PIECE_EMPTY)
-							board[i][k] = root;
+							growth.push([i,k]);
 						break;
 					}
 				}
@@ -123,12 +124,15 @@ function turn(x,y) {
 					let tile = board[i][k];
 					if (tile != root) {
 						if (tile == PIECE_EMPTY)
-							board[i][k] = root;
+							growth.push([i,k]);
 						break;
 					}
 				}
 			}
 		}
+	}
+	for (let [i,j] of growth) {
+		board[i][j] = root;
 	}
 	let whiteScore = 0;
 	let blackScore = 0;
