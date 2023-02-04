@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title>roots</title>
+		<style>
+body {
+	background-color: SaddleBrown;
+	color: SeaShell;
+}
+table {
+	border-collapse: collapse;
+	width: 300px;
+	height: 300px;
+}
+td {
+	width: 30px;
+	height: 30px;
+	text-align: center;
+	background-color: RosyBrown;
+	border: 1px solid DarkGreen;
+}
+.black { background-color: DimGrey; }
+.white { background-color: LightGray; }
+.plant { color: black; }
+		</style>
+	</head>
+	<body>
+		<div id='score'></div>
+		<div id='board'></div>
+		<script>
+const SIZE = 9;
+const PIECE_EMPTY = 0;
+const PIECE_WHITE_PLANT = 1;
+const PIECE_WHITE_ROOT  = 2;
+const PIECE_BLACK_PLANT = 3;
+const PIECE_BLACK_ROOT  = 4;
+let htmlBoard = document.getElementById('board');
+let htmlScore = document.getElementById('score');
+function emptyBoard() {
+	let board = [];
+	for (let i = 0; i < SIZE; i++) {
+		board[i] = [];
+		for (let j = 0; j < SIZE; j++) {
+			board[i][j] = 0;
+		}
+	}
+	return board;
+}
+let board = emptyBoard();
+function pieceToCell(i,j) {
+	let ret = document.createElement('td');
+	ret.addEventListener('click', () => turn(i,j) );
+	switch (board[i][j]) {
+		case PIECE_WHITE_PLANT:
+			ret.classList.add('plant');
+			ret.innerHTML = "+";
+		case PIECE_WHITE_ROOT :
+			ret.classList.add('white');
+			break;
+		case PIECE_BLACK_PLANT:
+			ret.classList.add('plant');
+			ret.innerHTML = "+";
+		case PIECE_BLACK_ROOT :
+			ret.classList.add('black');
+			break;
+	}
+	return ret;
+}
+function drawnBoard() {
+	let table = document.createElement('table');
+	for (let i = 0; i < SIZE; i++) {
+		let row = document.createElement('tr');
+		for (let j = 0; j < SIZE; j++) {
+			row.appendChild(pieceToCell(i,j));
+		}
+		table.appendChild(row);
+	}
+	return table;
+}
+htmlBoard.replaceChildren(drawnBoard());
+
+let playerOne = true;
+function turn(x,y) {
+	console.log("click", x, y);
+	if (board[x][y] != PIECE_EMPTY) {
+		console.log(x,y,"spot taken by", board[x][y]);
+		return;
+	}
+	let plant = playerOne ? PIECE_WHITE_PLANT : PIECE_BLACK_PLANT;
+	let root = playerOne ? PIECE_WHITE_ROOT : PIECE_BLACK_ROOT;
+	board[x][y] = plant;
+	for (let i = 0; i < SIZE; i++) {
+		for (let j = 0; j < SIZE; j++) {
+			if (board[i][j] == plant) {
+				for (k = i-1; k >= 0; k--) {
+					let tile = board[k][j];
+					if (tile != root) {
+						if (tile == PIECE_EMPTY)
+							board[k][j] = root;
+						break;
+					}
+				}
+				for (k = i+1; k < SIZE; k++) {
+					let tile = board[k][j];
+					if (tile != root) {
+						if (tile == PIECE_EMPTY)
+							board[k][j] = root;
+						break;
+					}
+				}
+				for (k = j-1; k >= 0; k--) {
+					let tile = board[i][k];
+					if (tile != root) {
+						if (tile == PIECE_EMPTY)
+							board[i][k] = root;
+						break;
+					}
+				}
+				for (k = j+1; k < SIZE; k++) {
+					let tile = board[i][k];
+					if (tile != root) {
+						if (tile == PIECE_EMPTY)
+							board[i][k] = root;
+						break;
+					}
+				}
+			}
+		}
+	}
+	let whiteScore = 0;
+	let blackScore = 0;
+	for (let row of board) {
+		for (let cell of row) {
+			switch(cell) {
+				case PIECE_WHITE_PLANT:
+				case PIECE_WHITE_ROOT:
+					whiteScore++;
+					break;
+				case PIECE_BLACK_PLANT:
+				case PIECE_BLACK_ROOT:
+					blackScore++;
+					break;
+			}
+		}
+	}
+	playerOne = !playerOne;
+	htmlBoard.replaceChildren(drawnBoard());
+	htmlScore.innerHTML = `player: ${playerOne ? 'white' : 'black'}\nwhite: ${whiteScore}\nblack: ${blackScore}`;
+}
+
+		</script>
+	</body>
+</html>
